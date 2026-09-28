@@ -68,7 +68,7 @@ class MySqlReader:
                     hcn_crn_flag_value = None
 
                 insert_values = (
-                    station.station_id,
+                    station.id_code,
                     station.lat,
                     station.lon,
                     station.elev,

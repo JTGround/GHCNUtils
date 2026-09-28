@@ -1,7 +1,7 @@
 import pandas
 
-from ghcn.types.stations import Station, Country, Inventory, StationSourceRanking, StationSource, State
-from ghcn.types.records import ClimateNetwork, DailyValue, ElementMonthlyRecord
+from ghcn_types import (Station, Country, Inventory, StationSourceRanking, StationSource, State, ClimateNetwork,
+                        DailyValue, ElementMonthlyRecord)
 import os
 
 station_cols = [(0, 11), (12, 20), (21, 30), (31, 37), (38, 40), (41, 71), (72, 75), (76, 79), (80, 85)]
@@ -18,11 +18,7 @@ invent_names = ['station_id', 'lat', 'lon', 'element', 'first_year', 'last_year'
 
 
 def read_stations(source_path):
-    station_list = []
-
-    if not os.path.exists(source_path):
-        print('File (path=' + source_path + ') does not exist.')
-        return station_list
+    stations = []
 
     file = open(source_path, 'r')
     try:
@@ -50,10 +46,10 @@ def read_stations(source_path):
             if not wmo_id:
                 wmo_id = None
             station = Station(station_id, lat, lon, elev, state, name, gsn, network_enum, wmo_id)
-            station_list.append(station)
+            stations.append(station)
     finally:
         file.close()
-    return station_list
+    return stations
 
 
 def read_stations_df(source_path):
@@ -218,56 +214,3 @@ def parse_dly(source_path):
         file.close()
     return records
 
-
-def combine_dly(source_path, target_path, delete_source=False):
-    if not os.path.exists(source_path):
-        print('File (path=' + source_path + ') does not exist.')
-        return
-
-    # read in text lines from source file
-    lines = []
-    file_read = open(source_path, 'r')
-    try:
-        for line in file_read:
-            lines.append(line)
-    finally:
-        file_read.close()
-
-    # read in records from target file
-    key_set = set()
-    station_set = set()
-    file_append_initial = open(target_path, 'r')
-    try:
-        for line in file_append_initial:
-            station_id = line[0:11]
-            station_set.add(station_id)
-
-            line_key = line[0:21]
-            key_set.add(line_key)
-    finally:
-        file_append_initial.close()
-
-    # write text lines to target file
-    file_append = open(target_path, 'a')
-    try:
-        for line in lines:
-            # check if dup station
-            station_id = line[0:11]
-            key = line[0:21]
-            if station_id not in station_set:
-                file_append.write(line)
-            else:
-                if key not in key_set:
-                    file_append.write(line)
-    finally:
-        file_append.close()
-
-    # delete the source file, if required
-    if delete_source:
-        if os.path.exists(source_path):
-            try:
-                os.remove(source_path)
-            except IOError:
-                print("Unable to delete file: path=" + source_path)
-        else:
-            print("File (path=" + source_path + ") does not exist.")

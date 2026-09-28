@@ -1,30 +1,33 @@
-# Description
+## Description
 This repository provides a basic framework to access and
-manipulate some of the stores of environmental data hosted by the National Centers for Environmental
-Information. The NCEI is part of the National Oceanic and Atmospheric Administration 
-and provides an archive of years of environmental data.   
+manipulate the National Weather Service's Global Historical Climatology Network dataset. 
+The GHCN dataset contains decades of daily climate records from over 100,000 stations.
 
-# Data Repositories
-### Global Historical Climatology Network
+## The Dataset  
+This package handles the stations, countries, states, 
+and the "daily" climate files (and their respective schemas and types) that can be  found at the following source:  
 
+The summary and main search page:  
+https://www.ncei.noaa.gov/access/search/datasets/daily-summaries/  
+
+Bulk download:  
+S3 Bucket: https://noaa-ghcn-pds.s3.amazonaws.com/index.html  
+Direct Download: https://www.ncei.noaa.gov/pub/data/ghcn/daily/  
+
+
+## File type conversions
+The original fixed-width files can be converted to CSV, GEOJSON file types for easier manipulation.
 ```
-from ghcn.io import read_stations
+from pathlib import Path
+from ghcn_utils import stations_copy_to_csv, dly_copy_to_csv
 
-# Read from txt file - into list of stations
-stations_list = read_stations('./data/ghcnd-stations.txt')
+stations_source = Path("C:/ghcnd-download/ghcnd-stations.txt")
+stations_copy_to_csv(stations_source)
 
-# Read from txt file - into pandas dataframe
-stations_dataframe = read_stations_df('./data/ghcnd-stations.txt')
+dly_source = Path("C:/ghcnd-download/ghcnd-stations.txt")
+dly_copy_to_csv(dly_source)
 ```
 
-Web Search  
-https://www.ncei.noaa.gov/access/search/data-search/daily-summaries  
-  
-Direct Download  
-https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/
-
-FTP Server  
-ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/daily
 
 # Load data into MySql
 
